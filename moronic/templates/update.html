@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-success" role="alert">
+            <h5 class="alert-heading">{{ message }}</h5>
+            <button type = "button" class = "btn-close" data-bs-dismiss = "alert" aria-label="Close"></button>
+            <hr>
+        </div>
+    {% endfor %}
+    {% if name %}
+        <h1> You are an updated moron {{name}}!</h1>
+        <br/><br/>
+        <table class="table table-hover table-bordered table-striped">
+            {% for our_user in our_users %}
+                <tr>
+                <td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }} - {{ our_user.moron_level }} - <a href="{{ url_for('delete', id=our_user.id) }}">Delete</a> </td>
+                </tr>    
+            {% endfor %}
+
+        </table>
+    {% else %}
+        <h1>Update Moron : </h1>
+        <br/>
+        <div class="shadow p-3 mb-5 bg-body rounded">
+            <form action="/update/{{ name_to_update.id }}" method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control",  value=name_to_update.name) }}
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", value=name_to_update.email) }}
+                {{ form.moron_level.label(class="form-label") }}
+                {{ form.moron_level(class="form-control",  value=name_to_update.moron_level) }}
+                <br/>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+
+        <!-- <br/><br/>
+        <table class="table table-hover table-bordered table-striped">
+            {% for our_user in our_users %}
+                <tr>
+                <td>{{ our_user.id }}. {{ our_user.name }} - {{ our_user.email }} </td>
+                </tr>    
+            {% endfor %}
+
+        </table> -->
+        
+    {% endif %}
+
+{% endblock %}

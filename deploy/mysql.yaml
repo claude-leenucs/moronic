@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  type: ClusterIP
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-db-secret
+type: Opaque
+data:
+  DB_PASS: bXktc2VjcmV0LXB=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-db-config
+data:
+  DB_IP: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-db-secret
+              key: DB_PASS
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim-dup
+  
