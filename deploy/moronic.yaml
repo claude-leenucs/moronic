@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moronic
+spec:
+  selector:
+    matchLabels:
+      app: moronic
+  template:
+    metadata:
+      labels:
+        app: moronic
+    spec:
+      containers:
+      - name: moronic
+        image: leenucs/moronic
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_PASS
+          valueFrom: 
+            secretKeyRef:
+                name: app-db-secret
+                key: DB_PASS
+        - name: DB_IP
+          valueFrom:
+            configMapKeyRef:
+                name: app-db-config
+                key: DB_IP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: moronic
+spec:
+  selector:
+    app: moronic
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
